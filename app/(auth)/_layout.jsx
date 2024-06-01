@@ -1,21 +1,27 @@
 import { View, Text } from "react-native";
-import React from "react";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const AuthLayout = () => {
   return (
-    <View className="flex-1 justify-center items-center bg-black-100">
-      <Text className="text-2xl font-pblack text-white">
-        Under Development 👷‍♂️⚒️ {"\n"}
-        {"\n"}
-      </Text>
+    <>
+      <Stack>
+        <Stack.Screen
+          name="sign-in"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="sign-up"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack>
 
-      <Text className="text-2xl font-pblack text-white">
-        What you Looking at 👀 😂
-      </Text>
-      <Text className="text-slate-400 absolute bottom-3">
-        Made with ❤️ by Aditya 🔥
-      </Text>
-    </View>
+      <StatusBar backgroundColor="#161622" style="light" />
+    </>
   );
 };
 
