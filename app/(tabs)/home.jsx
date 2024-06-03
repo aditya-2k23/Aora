@@ -1,16 +1,11 @@
-import { View, Text, FlatList, Image, RefreshControl } from "react-native";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, Image, RefreshControl, Text, View } from "react-native";
 
 import { images } from "../../constants";
-
-import SearchInput from "../../components/SearchInput";
-import Trending from "../../components/Trending";
-import EmptyState from "../../components/EmptyState";
-import VideoCard from "../../components/VideoCard";
-
 import useAppwrite from "../../lib/useAppwrite";
 import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
 
 const Home = () => {
   const { data: posts, refetch } = useAppwrite(getAllPosts);
@@ -24,18 +19,24 @@ const Home = () => {
     setRefreshing(false);
   };
 
+  // one flatlist
+  // with list header
+  // and horizontal flatlist
+
+  //  we cannot do that with just scrollview as there's both horizontal and vertical scroll (two flat lists, within trending)
+
   return (
-    <SafeAreaView className="bg-primary h-full">
+    <SafeAreaView className="bg-primary">
       <FlatList
-        data={[{ id: 1 }, { id: 2 }, { id: 3 }]}
+        data={posts}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
           <VideoCard
             title={item.title}
             thumbnail={item.thumbnail}
             video={item.video}
-            creator={item.creator}
-            avatar={item.avatar}
+            creator={item.creator.username}
+            avatar={item.creator.avatar}
           />
         )}
         ListHeaderComponent={() => (
@@ -62,8 +63,8 @@ const Home = () => {
             <SearchInput />
 
             <View className="w-full flex-1 pt-5 pb-8">
-              <Text className="text-gray-100 text-lg font-pregular mb-3">
-                Latest Videos!
+              <Text className="text-lg font-pregular text-gray-100 mb-3">
+                Latest Videos
               </Text>
 
               <Trending posts={latestPosts ?? []} />
@@ -72,8 +73,8 @@ const Home = () => {
         )}
         ListEmptyComponent={() => (
           <EmptyState
-            title="No videos found!"
-            subtitle="Be the first one to upload a video!"
+            title="No Videos Found"
+            subtitle="No videos created yet"
           />
         )}
         refreshControl={
