@@ -7,6 +7,7 @@ import useAppwrite from "../../lib/useAppwrite";
 import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
 import { EmptyState, SearchInput, Trending, VideoCard } from "../../components";
 import { useGlobalContext } from "../../context/GlobalProvider";
+import { StatusBar } from "expo-status-bar";
 
 const Home = () => {
   const { data: posts, refetch } = useAppwrite(getAllPosts);
@@ -57,7 +58,7 @@ const Home = () => {
               </View>
             </View>
 
-            <SearchInput />
+            <SearchInput placeholder="Search for videos" />
 
             <View className="w-full flex-1 pt-5 pb-8">
               <Text className="text-lg font-pregular text-gray-100 mb-3">
@@ -78,6 +79,10 @@ const Home = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+      <StatusBar backgroundColor="#161622" style="light" />
+      <Text className="text-slate-400 absolute left-[115px] bottom-3">
+        Made with ❤️ by Aditya 🔥
+      </Text>
     </SafeAreaView>
   );
 };
