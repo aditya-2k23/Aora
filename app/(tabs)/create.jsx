@@ -1,23 +1,21 @@
+import { useState } from "react";
+import { router } from "expo-router";
+import { ResizeMode, Video } from "expo-av";
+import * as ImagePicker from "expo-image-picker";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Image,
   Alert,
+  Image,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import FormField from "../../components/FormField";
-import { useState } from "react";
-import { ResizeMode, Video } from "expo-av";
 
 import { icons } from "../../constants";
-
-import CustomButton from "../../components/CustomButton";
-import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
 import { createVideo } from "../../lib/appwrite";
-import useGlobalContext from "../../context/GlobalProvider";
+import { CustomButton, FormField } from "../../components";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const Create = () => {
   const { user } = useGlobalContext();
@@ -41,50 +39,61 @@ const Create = () => {
 
     if (!result.canceled) {
       if (selectType === "image") {
-        setForm({ ...form, thumbnail: result.assets[0] });
+        setForm({
+          ...form,
+          thumbnail: result.assets[0],
+        });
       }
+
       if (selectType === "video") {
-        setForm({ ...form, video: result.assets[0] });
+        setForm({
+          ...form,
+          video: result.assets[0],
+        });
       }
     }
   };
 
-  const submit = () => {
-    if (!form.prompt || !form.title || !form.thumbnail || !form.video) {
-      return Alert.alert("Please fill in all the fields");
+  const submit = async () => {
+    if (
+      (form.prompt === "") |
+      (form.title === "") |
+      !form.thumbnail |
+      !form.video
+    ) {
+      return Alert.alert("Please provide all fields");
+    }
+
+    setUploading(true);
+    try {
+      await createVideo({
+        ...form,
+        userId: user.$id,
+      });
+
+      Alert.alert("Success", "Post uploaded successfully");
+      router.push("/home");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setForm({
+        title: "",
+        video: null,
+        thumbnail: null,
+        prompt: "",
+      });
+
+      setUploading(false);
     }
   };
-
-  setUploading(true);
-
-  try {
-    createVideo({
-      ...form,
-      userId: user.$id,
-    });
-
-    Alert.alert("Success", "Video uploaded successfully");
-    router.push("/home");
-  } catch (error) {
-    Alert.alert("Error", error.message);
-  } finally {
-    setForm({
-      title: "",
-      video: null,
-      thumbnail: null,
-      prompt: "",
-    });
-
-    setUploading(false);
-  }
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView className="px-4 my-6">
-        <Text className="text-2xl text-white font-psemibold">Upload video</Text>
+        <Text className="text-2xl text-white font-psemibold">Upload Video</Text>
 
         <FormField
-          title="Video title"
+          title="Video Title"
           value={form.title}
           placeholder="Give your video a catchy title..."
           handleChangeText={(e) => setForm({ ...form, title: e })}
@@ -104,11 +113,12 @@ const Create = () => {
                 resizeMode={ResizeMode.COVER}
               />
             ) : (
-              <View className="w-full h-40 px-4 bg-black-100 rounded-2xl justify-center items-center">
-                <View className="w-14 h-14 border border-dashed border-secondary-100 justify-center items-center">
+              <View className="w-full h-40 px-4 bg-black-100 rounded-2xl border border-black-200 flex justify-center items-center">
+                <View className="w-14 h-14 border border-dashed border-secondary-100 flex justify-center items-center">
                   <Image
                     source={icons.upload}
                     resizeMode="contain"
+                    alt="upload"
                     className="w-1/2 h-1/2"
                   />
                 </View>
@@ -122,7 +132,7 @@ const Create = () => {
             Thumbnail Image
           </Text>
 
-          <TouchableOpacity onPress={openPicker("image")}>
+          <TouchableOpacity onPress={() => openPicker("image")}>
             {form.thumbnail ? (
               <Image
                 source={{ uri: form.thumbnail.uri }}
@@ -130,10 +140,11 @@ const Create = () => {
                 className="w-full h-64 rounded-2xl"
               />
             ) : (
-              <View className="w-full h-16 px-4 bg-black-100 rounded-2xl justify-center items-center border-2 border-black-200 flex-row space-x-2">
+              <View className="w-full h-16 px-4 bg-black-100 rounded-2xl border-2 border-black-200 flex justify-center items-center flex-row space-x-2">
                 <Image
                   source={icons.upload}
                   resizeMode="contain"
+                  alt="upload"
                   className="w-5 h-5"
                 />
                 <Text className="text-sm text-gray-100 font-pmedium">
