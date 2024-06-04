@@ -80,9 +80,6 @@ const Home = () => {
         }
       />
       <StatusBar backgroundColor="#161622" style="light" />
-      <Text className="text-slate-400 absolute left-[115px] bottom-3">
-        Made with ❤️ by Aditya 🔥
-      </Text>
     </SafeAreaView>
   );
 };

@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import { Task, Redirect, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 
 import { icons } from "../../constants";
 
